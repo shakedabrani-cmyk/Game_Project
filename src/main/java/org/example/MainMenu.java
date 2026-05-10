@@ -51,6 +51,7 @@ public class MainMenu extends JFrame {
             // 1. יוצרים את פאנל ההוראות (תלוי איך חברה שלך בנתה אותו בינתיים)
             // אם היא עשתה שהוא מקבל מידות, תשאירי עם הפרמטרים. אם לא - תמחקי אותם ותשאירי רק סוגריים ריקים: new InstructionsPanel()
             InstructionsPanel instructionsPanel = new InstructionsPanel(Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT, backgroundPanel, this);
+
             // 2. מחליפים את התצוגה מפאנל התפריט לפאנל ההוראות
             this.setContentPane(instructionsPanel);
             this.revalidate();

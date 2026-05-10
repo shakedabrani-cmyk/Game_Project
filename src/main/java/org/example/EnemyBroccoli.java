@@ -1,14 +1,9 @@
 package org.example;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.io.InputStream;
-
 public class EnemyBroccoli extends Enemy {
 
     public EnemyBroccoli(int x, int y, int width, int height) {
         super(x, y, width, height);
-
         setFrontImage(loadImage("/Broccoli_Front.png"));
         setBackImage(loadImage("/Broccoli_Back.png"));
         setRightImage(loadImage("/Broccoli_Right.png"));
@@ -20,6 +15,7 @@ public class EnemyBroccoli extends Enemy {
     @Override
     public void move() {
         if (!isMoving()) return;
+
         boolean hitBoundary = false;
         if (getDirection() == RIGHT) {
             if (!isAtRightBoundary()) {

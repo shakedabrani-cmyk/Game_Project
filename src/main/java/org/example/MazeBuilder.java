@@ -6,23 +6,21 @@ public class MazeBuilder {
     private int cakesCount;
 
     public Cake[] buildMaze(int templateIndex, int width, int height, int difficulty) {
-        this.cakes = new Cake[300];
+        this.cakes = new Cake[500]; // הגדלתי כדי שיהיה מקום למבוכים שפרוסים על כל המסך
         this.cakesCount = 0;
 
         int cols = width / CAKE_SIZE;
         int rows = height / CAKE_SIZE;
-        int midX = cols / 2;
-        int midY = rows / 2;
 
         switch (templateIndex) {
             case 0:
-                drawCenterFortressMaze(cols, rows, midX, midY, difficulty);
+                drawExpandedFortress(cols, rows, difficulty);
                 break;
             case 1:
-                drawDenseMaze(cols, rows, midX, midY, difficulty);
+                drawCityGrid(cols, rows, difficulty);
                 break;
             case 2:
-                drawSlalomMaze(cols, rows, difficulty);
+                drawFullSlalom(cols, rows, difficulty);
                 break;
         }
 
@@ -33,108 +31,93 @@ public class MazeBuilder {
         return this.cakesCount;
     }
 
-    // --- תבנית 0: "זירת המרכז" - פתוחה, מרווחת ומרוכזת ---
-    private void drawCenterFortressMaze(int cols, int rows, int midX, int midY, int difficulty) {
-        // קירות אופקיים של הזירה (למעלה ולמטה) עם פתח רחב מאוד באמצע!
-        for (int i = midX - 5; i <= midX + 5; i++) {
-            if (i < midX - 1 || i > midX + 1) { // פתח ענק של 3 משבצות
-                addCake(i, midY - 3);
-                addCake(i, midY + 3);
+    // --- תבנית 0: "מבצר פרוס" ---
+    // קירות חיצוניים גדולים וקירות פנימיים שיוצרים מסדרונות היקפיים
+    private void drawExpandedFortress(int cols, int rows, int difficulty) {
+        int padding = 4; // מרחק מהקירות
+
+        // מסגרת פנימית גדולה
+        for (int i = padding; i < cols - padding; i++) {
+            if (i < cols/2 - 2 || i > cols/2 + 2) { // פתחים רחבים באמצע הלמעלה/למטה
+                addCake(i, padding);
+                addCake(i, rows - padding - 1);
+            }
+        }
+        for (int j = padding; j < rows - padding; j++) {
+            if (j < rows/2 - 2 || j > rows/2 + 2) { // פתחים רחבים בצדדים
+                addCake(padding, j);
+                addCake(cols - padding - 1, j);
             }
         }
 
-        // קירות אנכיים של הזירה (צדדים) עם פתח פתוח לחלוטין
-        for (int j = midY - 2; j <= midY + 2; j++) {
-            if (j != midY) { // פתח באמצע הקיר
-                addCake(midX - 5, j);
-                addCake(midX + 5, j);
-            }
-        }
+        // במרכז, מבנה קטן עם שינוי קושי
+        int midX = cols / 2;
+        int midY = rows / 2;
+        addCake(midX - 2, midY - 2);
+        addCake(midX + 2, midY - 2);
+        addCake(midX - 2, midY + 2);
+        addCake(midX + 2, midY + 2);
 
-        // שינויים דינמיים כשהקושי עולה (מוסיף עניין)
         if (difficulty >= 1) {
-            // הוספת עמודי פינות קטנים
-            addCake(3, 3);
-            addCake(cols - 4, 3);
-            addCake(3, rows - 4);
-            addCake(cols - 4, rows - 4);
-        }
-        if (difficulty >= 2) {
-            // הצרת הפתחים המרכזיים טיפה ברמות הקשות
-            addCake(midX - 1, midY - 3);
-            addCake(midX + 1, midY + 3);
+            addCake(midX, midY); // מכשול באמצע
         }
     }
 
-    // --- תבנית 1: הצפופה (עם שינויים לפי קושי) ---
-    private void drawDenseMaze(int cols, int rows, int midX, int midY, int difficulty) {
-        // מתחילים את צורות ה-L במיקומים שונים לפי הקושי!
-        int shift = difficulty % 2; // יזיז את כל המבוך משבצת אחת ימינה ברמות מתקדמות
+    // --- תבנית 1: "עיר צפופה" ---
+    // מפוזר על כל המסך בצורה שווה עם חסימות שזזות
+    private void drawCityGrid(int cols, int rows, int difficulty) {
+        int shift = difficulty % 2;
 
-        for (int i = 4 + shift; i < cols - 3; i += 4) {
-            for (int j = 4; j < rows - 3; j += 4) {
+        for (int i = 5 + shift; i < cols - 3; i += 5) {
+            for (int j = 3; j < rows - 3; j += 4) {
+                // יוצר בלוקים קטנים בכל רחבי המסך
                 addCake(i, j);
                 addCake(i + 1, j);
-                addCake(i, j + 1);
+
+                // הוספת קיר שמקשה על מעבר אנכי ברמות קשות
+                if (difficulty >= 1 && j % 2 == 0) {
+                    addCake(i, j + 1);
+                }
             }
         }
 
-        // חגורות מרכזיות
-        for (int i = midX - 4; i <= midX + 4; i++) {
-            if (i != midX && i != midX - 1) {
-                addCake(i, midY - 2);
-            }
-        }
-
-        if (difficulty >= 1) {
-            // הוספת חסימה נוספת למטה ברמות קשות
-            for (int i = midX - 3; i <= midX + 3; i++) {
-                if (i != midX) addCake(i, midY + 3);
+        // שורת עוגות רצופה שתחתוך את המסך לרוחב (כמעט עד הסוף)
+        for (int i = 3; i < cols - 6; i++) {
+            if (i % 4 != 0) { // משאיר פתחים קטנים
+                addCake(i, rows / 2);
             }
         }
     }
 
-    // --- תבנית 2: סלאלום זיגזג ---
-    private void drawSlalomMaze(int cols, int rows, int difficulty) {
-        int wallSpacing = 4;
-
-        // טריק מעולה: כל פעם שעולים בקושי, הזיגזג מתהפך! פעם מתחיל מלמעלה ופעם מלמטה
+    // --- תבנית 2: סלאלום מלא מקצה לקצה ---
+    private void drawFullSlalom(int cols, int rows, int difficulty) {
+        int wallSpacing = 5; // מרווח בין העמודים שמאפשר מעבר קל
         boolean gapAtBottom = (difficulty % 2 == 0);
 
-        // מזיזים את תחילת הקירות לפי הקושי כדי שזה לא יהיה בדיוק אותו מבוך
-        int startCol = 4 + (difficulty % 3);
-
-        for (int i = startCol; i < cols - 2; i += wallSpacing) {
+        for (int i = 5; i < cols - 2; i += wallSpacing) {
             if (gapAtBottom) {
-                for (int j = 1; j < rows - 3; j++) {
+                // חומה עד כמעט למטה
+                for (int j = 1; j < rows - 4; j++) {
                     addCake(i, j);
                 }
             } else {
-                for (int j = 3; j < rows - 1; j++) {
+                // חומה עד כמעט למעלה
+                for (int j = 4; j < rows - 1; j++) {
                     addCake(i, j);
                 }
             }
-            gapAtBottom = !gapAtBottom; // הופך כל פעם כדי ליצור זיגזג
+            gapAtBottom = !gapAtBottom; // הופך כיוון
         }
     }
-    private void addCake(int gridX, int gridY) {
 
+    private void addCake(int gridX, int gridY) {
+        // בועת הגנה ענקית סביב השחקן (שלא ייווצר עליו קיר בשום מצב)
         if (gridX >= 1 && gridX <= 4 && gridY >= 1 && gridY <= 4) {
             return;
         }
 
-        int[] blockedX = {6, 10, 14, 18, 22, 26};
-        int[] blockedY = {6, 6, 6, 10, 10, 10};
-
-        for (int i = 0; i < blockedX.length; i++) {
-            if (gridX == blockedX[i] && gridY == blockedY[i]) {
-                return;
-            }
-        }
-
         if (cakesCount < cakes.length) {
-            cakes[cakesCount++] =
-                    new Cake(gridX * CAKE_SIZE, gridY * CAKE_SIZE, CAKE_SIZE, CAKE_SIZE);
+            cakes[cakesCount++] = new Cake(gridX * CAKE_SIZE, gridY * CAKE_SIZE, CAKE_SIZE, CAKE_SIZE);
         }
     }
 }

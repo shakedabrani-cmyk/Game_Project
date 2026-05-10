@@ -29,6 +29,31 @@ public class Utils {
         }
     }
 
+    // פונקציה שעוצרת את מוזיקת הרקע מכל מקום במשחק ומעדכנת את המערכת
+    public static void stopMusic() {
+        // בודקים שיש בכלל מוזיקה שנטענה
+        if (backgroundMusic != null) {
+            backgroundMusic.stop(); // עוצרים את הסאונד בפועל
+            isMusicPlaying = false; // מעדכנים את המערכת שהמוזיקה כבויה כעת
+        }
+    }
+
+    // פונקציה זו מפעילה את המוזיקה הכללית מחדש ומעדכנת את המערכת שהיא פועלת
+    public static void playMusic() {
+        if (backgroundMusic != null) {
+            backgroundMusic.playLoop();
+            isMusicPlaying = true; // מעדכנים חזרה כדי שהכפתור ידע שהמוזיקה פועלת
+        }
+    }
+
+    public static void syncButtonIcon(JButton button) {
+        if (isMusicPlaying && soundOnIcon != null) {
+            button.setIcon(soundOnIcon);
+        } else if (!isMusicPlaying && soundOffIcon != null) {
+            button.setIcon(soundOffIcon);
+        }
+    }
+
     // פונקציית הקסם: יוצרת ומחזירה כפתור מוזיקה פעיל לחלוטין!
     public static JButton createSoundButton() {
         if (soundOnIcon == null || soundOffIcon == null) //צריך לבדוק
