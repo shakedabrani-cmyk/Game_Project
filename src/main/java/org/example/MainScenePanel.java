@@ -21,6 +21,7 @@ public class MainScenePanel extends JPanel {
     private final int CAKE_SIZE = 50;
     private LevelsBackground levelsBackground;
     private JButton soundButton;
+    private SoundManager tickingSound;
 
     private int currentLevel = 1;
     private final int MAX_LEVELS = 9;
@@ -40,6 +41,7 @@ public class MainScenePanel extends JPanel {
                 "/Purple_candy.png",
                 "/Yellow_candy.png"
         };
+        this.tickingSound = new SoundManager("/Clock_sound.wav");
         this.setBounds(x, y, width, height);
         this.setLayout(null);
         this.levelsBackground = new LevelsBackground();
@@ -88,6 +90,9 @@ public class MainScenePanel extends JPanel {
     }
 
     private void loadLevel(int level) {
+        if (this.tickingSound != null) {
+            this.tickingSound.stop();
+        }
         // איפוס הטיימר ל-60 שניות בכל טעינת שלב
         this.timeLeft = 60;
         this.timerCounter = 0;
@@ -346,6 +351,9 @@ public class MainScenePanel extends JPanel {
             currentLevel++;
             if (currentLevel > MAX_LEVELS) {
                 Utils.stopMusic();
+                if (this.tickingSound != null) {
+                    this.tickingSound.stop();
+                }
                 playSound("/Victory_sound.wav");
 
                 ImageIcon originalIcon = new ImageIcon(getClass().getResource("/Trophy_Icon.png"));
@@ -423,6 +431,12 @@ public class MainScenePanel extends JPanel {
             timeLeft--; // מורידים שנייה מהטיימר
             timerCounter = 0; // מאפסים את המונה לשנייה הבאה
 
+            if (timeLeft == 10) {
+                if (this.tickingSound != null) {
+                    this.tickingSound.playLoop();
+                }
+            }
+
             // מה קורה כשנגמר הזמן?
             if (timeLeft <= 0) {
                 timeLeft = 0; // מוודאים שהזמן לא יורד בטעות מתחת לאפס
@@ -439,6 +453,9 @@ public class MainScenePanel extends JPanel {
 
     private boolean handleGameOver(String message, String title) {
         Utils.stopMusic();
+        if (this.tickingSound != null) {
+            this.tickingSound.stop();
+        }
         // --- כאן אנחנו מנגנים את צליל ההפסד מיד כשמופעלת הפסילה ---
         playSound("/Losing_sound.wav");
         // -----------------------------------------------------------
