@@ -24,7 +24,7 @@ public class MainScenePanel extends JPanel {
     private SoundManager tickingSound;
 
     private int currentLevel = 1;
-    private final int MAX_LEVELS = 9;
+    private final int MAX_LEVELS = 15;
 
     private boolean isPaused = false;
     private boolean isLevelStarting = true;
@@ -93,8 +93,13 @@ public class MainScenePanel extends JPanel {
         if (this.tickingSound != null) {
             this.tickingSound.stop();
         }
-        // איפוס הטיימר ל-60 שניות בכל טעינת שלב
-        this.timeLeft = 60;
+
+        if (level >= 9 && level <= 15) {
+            this.timeLeft = 90;
+        } else {
+            this.timeLeft = 60;
+        }
+
         this.timerCounter = 0;
 
         if (this.player == null) {
@@ -110,7 +115,7 @@ public class MainScenePanel extends JPanel {
         int amountOfCandies = 5 + (difficultyTier * 3);
         // תמיד לפחות 3 ירקות רגילים!
         int normalEnemies = 3 + difficultyTier;
-        int smartEnemies = difficultyTier;
+        int smartEnemies = Math.min(difficultyTier, 2);
 
         MazeBuilder mazeBuilder = new MazeBuilder();
         // מעבירים גם את הקושי לבונה המבוכים
@@ -360,7 +365,36 @@ public class MainScenePanel extends JPanel {
                 Image scaledImage = originalIcon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
                 ImageIcon TrophyIcon = new ImageIcon(scaledImage);
 
-                JOptionPane.showMessageDialog(null,  "ניצחת במשחק! כל הכבוד!" + "\nהניקוד שלך: " + this.score, "Victory", JOptionPane.PLAIN_MESSAGE, TrophyIcon);
+                // הגדרת הרקע ללבן נקי
+                UIManager.put("OptionPane.background", Color.WHITE);
+                UIManager.put("Panel.background", Color.WHITE);
+
+                JOptionPane pane = new JOptionPane(
+                        "ניצחת במשחק! כל הכבוד!\nהניקוד שלך: " + this.score,
+                        JOptionPane.PLAIN_MESSAGE,
+                        JOptionPane.DEFAULT_OPTION,
+                        TrophyIcon
+                );
+
+                Window parentWindow = SwingUtilities.windowForComponent(this);
+                JDialog dialog = new JDialog(parentWindow, "Victory", Dialog.ModalityType.APPLICATION_MODAL);
+
+                dialog.setUndecorated(true);
+                dialog.getRootPane().setBorder(BorderFactory.createLineBorder(new Color(144, 238, 144), 8));
+
+                dialog.setContentPane(pane);
+                dialog.pack();
+                dialog.setLocationRelativeTo(parentWindow);
+                dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+                // מאזין שמחכה שהשחקן ילחץ על הכפתור כדי לסגור את החלון
+                pane.addPropertyChangeListener(e -> {
+                    if (JOptionPane.VALUE_PROPERTY.equals(e.getPropertyName())) {
+                        dialog.dispose();
+                    }
+                });
+
+                dialog.setVisible(true);
                 System.exit(0);
             } else {
                 loadLevel(currentLevel);
@@ -456,15 +490,17 @@ public class MainScenePanel extends JPanel {
         if (this.tickingSound != null) {
             this.tickingSound.stop();
         }
-        // --- כאן אנחנו מנגנים את צליל ההפסד מיד כשמופעלת הפסילה ---
         playSound("/Losing_sound.wav");
-        // -----------------------------------------------------------
 
         Object[] options = {"Restart Level", "Back to Menu"};
 
         ImageIcon originalIcon = new ImageIcon(getClass().getResource("/BellPepper_Front.png"));
         Image scaledImage = originalIcon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
         ImageIcon pepperIcon = new ImageIcon(scaledImage);
+
+        // הגדרת הרקע ללבן נקי
+        UIManager.put("OptionPane.background", Color.WHITE);
+        UIManager.put("Panel.background", Color.WHITE);
 
         JOptionPane pane = new JOptionPane(
                 message + "\nהניקוד שלך: " + this.score,
@@ -475,8 +511,24 @@ public class MainScenePanel extends JPanel {
                 options[0]
         );
 
-        JDialog dialog = pane.createDialog(SwingUtilities.windowForComponent(this), title);
+        Window parentWindow = SwingUtilities.windowForComponent(this);
+        JDialog dialog = new JDialog(parentWindow, title, Dialog.ModalityType.APPLICATION_MODAL);
+
+        dialog.setUndecorated(true);
+        dialog.getRootPane().setBorder(BorderFactory.createLineBorder(Color.RED, 8));
+
+        dialog.setContentPane(pane);
+        dialog.pack();
+        dialog.setLocationRelativeTo(parentWindow);
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+        // מאזין שמחכה שהשחקן ילחץ על אחד הכפתורים כדי לסגור את החלון
+        pane.addPropertyChangeListener(e -> {
+            if (JOptionPane.VALUE_PROPERTY.equals(e.getPropertyName())) {
+                dialog.dispose();
+            }
+        });
+
         dialog.setVisible(true);
 
         Object selectedValue = pane.getValue();
@@ -486,23 +538,21 @@ public class MainScenePanel extends JPanel {
             this.score = 0;
             loadLevel(this.currentLevel);
 
-            Utils.playMusic(); // 1. מפעילים את המוזיקה הכללית
-            Utils.syncButtonIcon(this.soundButton); // 2. מעדכנים את תמונת הרמקול שעל המסך
+            Utils.playMusic();
+            Utils.syncButtonIcon(this.soundButton);
 
             return true;
         } else {
             // --- לחצו על Back to Menu ---
-            Utils.playMusic(); // מפעילים את המוזיקה לפני המעבר כדי שתמשיך לתפריט
+            Utils.playMusic();
 
-            Window parentWindow = SwingUtilities.windowForComponent(this);
             if (parentWindow != null) {
                 parentWindow.dispose();
             }
-            new MainMenu(); // התפריט ייפתח ויטען את הכפתור כשהוא כבר מסונכרן ודלוק
+            new MainMenu();
             return false;
         }
     }
-
 
     @Override
     public void paintComponent(Graphics graphics) {
