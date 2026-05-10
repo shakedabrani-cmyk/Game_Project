@@ -1,10 +1,13 @@
 package org.example;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Random;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.net.URL;
 
 public class MainScenePanel extends JPanel {
     private Player player;
@@ -287,6 +290,8 @@ public class MainScenePanel extends JPanel {
                     if (playerRect.intersects(prizes[i].getBounds())) {
                         prizes[i].setCollected(true);
                         this.score += 10;
+                        playSound("/Sweet_Reward.wav");
+
                     } else {
                         allCollected = false;
                     }
@@ -530,6 +535,27 @@ public class MainScenePanel extends JPanel {
             int y = getHeight() / 2;
 
             graphics.drawString(text, x, y);
+        }
+    }
+
+    // פונקציה זו טוענת קובץ סאונד מתיקיית המשאבים ומנגנת אותו
+    private void playSound(String soundFileName) {
+        try {
+            // חיפוש הקובץ בנתיב שציינו
+            URL soundURL = getClass().getResource(soundFileName);
+
+            if (soundURL != null) {
+                // פתיחת ערוץ שמע וניגון הקליפ
+                AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundURL);
+                Clip clip = AudioSystem.getClip();
+                clip.open(audioIn);
+                clip.start();
+            } else {
+                System.out.println("שגיאה: לא מצאתי את קובץ הסאונד " + soundFileName);
+            }
+        } catch (Exception e) {
+            System.out.println("שגיאה בניגון הסאונד:");
+            e.printStackTrace();
         }
     }
 }
