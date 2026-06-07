@@ -4,8 +4,6 @@ public class EnemyBroccoli extends Enemy {
 
     public EnemyBroccoli(int x, int y, int width, int height) {
         super(x, y, width, height);
-        setFrontImage(loadImage("/Broccoli_Front.png"));
-        setBackImage(loadImage("/Broccoli_Back.png"));
         setRightImage(loadImage("/Broccoli_Right.png"));
         setLeftImage(loadImage("/Broccoli_Left.png"));
         setCurrentImage(getRightImage());

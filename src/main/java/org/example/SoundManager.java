@@ -9,6 +9,7 @@ public class SoundManager {
     public SoundManager(String filePath) {
         try {
             URL soundURL = getClass().getResource(filePath);
+
             if (soundURL != null) {
                 AudioInputStream audioInput = AudioSystem.getAudioInputStream(soundURL);
                 clip = AudioSystem.getClip();
@@ -17,11 +18,12 @@ public class SoundManager {
                 System.out.println("לא מצאתי את קובץ השמע: " + filePath);
             }
         } catch (Exception e) {
-            System.out.println("שגיאה בטעינת המוזיקה: " + filePath);
+            System.out.println("שגיאה בטעינת הסאונד: " + filePath);
             e.printStackTrace();
         }
     }
 
+    // מפעיל סאונד בלופ מההתחלה
     public void playLoop() {
         if (clip != null) {
             clip.setFramePosition(0);
@@ -29,6 +31,7 @@ public class SoundManager {
         }
     }
 
+    // עוצר סאונד שרץ עכשיו
     public void stop() {
         if (clip != null && clip.isRunning()) {
             clip.stop();

@@ -2,15 +2,16 @@ package org.example;
 
 public class MazeBuilder {
     private final int CAKE_SIZE = 50;
+    private final int CAKE_ARRAY_SIZE = 500;
     private Cake[] cakes;
     private int cakesCount;
 
     public Cake[] buildMaze(int templateIndex, int width, int height, int difficulty) {
-        this.cakes = new Cake[500]; // הגדלתי כדי שיהיה מקום למבוכים שפרוסים על כל המסך
+        this.cakes = new Cake[CAKE_ARRAY_SIZE];
         this.cakesCount = 0;
 
-        int cols = width / CAKE_SIZE;
-        int rows = height / CAKE_SIZE;
+        int cols = width / CAKE_SIZE; //עמודות
+        int rows = height / CAKE_SIZE; // שורות
 
         switch (templateIndex) {
             case 0:
@@ -31,13 +32,13 @@ public class MazeBuilder {
         return this.cakesCount;
     }
 
-    // --- תבנית 0: "מבצר פרוס" ---
-    // קירות חיצוניים גדולים וקירות פנימיים שיוצרים מסדרונות היקפיים
+    //תבנית לשלבים לרמה 0
     private void drawExpandedFortress(int cols, int rows, int difficulty) {
         int padding = 4; // מרחק מהקירות
 
         // מסגרת פנימית גדולה
         for (int i = padding; i < cols - padding; i++) {
+            //פתח של ארבע עמודות באמצע
             if (i < cols/2 - 2 || i > cols/2 + 2) { // פתחים רחבים באמצע הלמעלה/למטה
                 addCake(i, padding);
                 addCake(i, rows - padding - 1);
@@ -63,7 +64,6 @@ public class MazeBuilder {
         }
     }
 
-    // --- תבנית 1: "עיר צפופה" ---
     // מפוזר על כל המסך בצורה שווה עם חסימות שזזות
     private void drawCityGrid(int cols, int rows, int difficulty) {
         int shift = difficulty % 2;
@@ -89,7 +89,7 @@ public class MazeBuilder {
         }
     }
 
-    // --- תבנית 2: סלאלום מלא מקצה לקצה ---
+    //  תבנית 2: סלאלום מלא מקצה לקצה
     private void drawFullSlalom(int cols, int rows, int difficulty) {
         int wallSpacing = 5; // מרווח בין העמודים שמאפשר מעבר קל
         boolean gapAtBottom = (difficulty % 2 == 0);
@@ -111,7 +111,7 @@ public class MazeBuilder {
     }
 
     private void addCake(int gridX, int gridY) {
-        // בועת הגנה ענקית סביב השחקן (שלא ייווצר עליו קיר בשום מצב)
+        // בועת הגנה ענקית סביב השחקן (שלא ייווצר עליו קיר)
         if (gridX >= 1 && gridX <= 4 && gridY >= 1 && gridY <= 4) {
             return;
         }

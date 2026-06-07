@@ -1,8 +1,5 @@
 package org.example;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.io.InputStream;
 
 public class EnemyEggplant extends Enemy {
 
@@ -11,9 +8,6 @@ public class EnemyEggplant extends Enemy {
 
         setFrontImage(loadImage("/Eggplant_Front.png"));
         setBackImage(loadImage("/Eggplant_Back.png"));
-        setRightImage(loadImage("/Eggplant_Right.png"));
-        setLeftImage(loadImage("/Eggplant_Left.png"));
-
         setCurrentImage(getFrontImage());
         setDirection(DOWN);
     }

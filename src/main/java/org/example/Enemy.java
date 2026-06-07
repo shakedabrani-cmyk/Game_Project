@@ -38,13 +38,12 @@ public class Enemy {
         this.width = width;
         this.height = height;
         this.direction = DOWN;
-        this.offsetLeft = 50;
-        this.offsetRight = 48;
-        this.offsetTop = 35;
-        this.offsetBottom = 50;
+        this.offsetLeft = GameSettings.WALL_LEFT;
+        this.offsetRight = GameSettings.WALL_RIGHT;
+        this.offsetTop = GameSettings.WALL_TOP;
+        this.offsetBottom = GameSettings.WALL_BOTTOM;
     }
 
-    // הילדים קוראים לפונקציות האלה כדי לזוז, בלי לדעת איך זה עובד מאחורי הקלעים!
     public void moveHorizontally(int amount) {
         this.x += amount;
     }

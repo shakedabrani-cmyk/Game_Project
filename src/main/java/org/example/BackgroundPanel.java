@@ -7,7 +7,6 @@ import java.net.URL;
 public class BackgroundPanel extends JPanel {
     private Image backgroundImage;
 
-    // השינוי כאן: הבנאי מקבל את נתיב התמונה כפרמטר
     public BackgroundPanel(String imagePath) {
         this.setLayout(null);
         this.backgroundImage = loadImage(imagePath);
@@ -33,4 +32,3 @@ public class BackgroundPanel extends JPanel {
         return null;
     }
 }
-

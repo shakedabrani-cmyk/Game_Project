@@ -9,11 +9,10 @@ public class Utils {
     public static SoundManager backgroundMusic;
     public static boolean isMusicPlaying = true;
 
-    // משתנים לשמירת התמונות כדי שלא נצטרך לטעון אותן מחדש כל פעם
     private static ImageIcon soundOnIcon;
     private static ImageIcon soundOffIcon;
 
-    public static void sleep(int milliseconds){
+    public static void sleep(int milliseconds) {
         try {
             Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
@@ -21,31 +20,31 @@ public class Utils {
         }
     }
 
+    // טוען את מוזיקת הרקע פעם אחת ומפעיל אותה
     public static void initializeMusic(String path) {
-        if (backgroundMusic == null) // צריך לבדוק
-        {
+        if (backgroundMusic == null) {
             backgroundMusic = new SoundManager(path);
             backgroundMusic.playLoop();
         }
     }
 
-    // פונקציה שעוצרת את מוזיקת הרקע מכל מקום במשחק ומעדכנת את המערכת
+    // עוצר את מוזיקת הרקע
     public static void stopMusic() {
-        // בודקים שיש בכלל מוזיקה שנטענה
         if (backgroundMusic != null) {
-            backgroundMusic.stop(); // עוצרים את הסאונד בפועל
-            isMusicPlaying = false; // מעדכנים את המערכת שהמוזיקה כבויה כעת
+            backgroundMusic.stop();
+            isMusicPlaying = false;
         }
     }
 
-    // פונקציה זו מפעילה את המוזיקה הכללית מחדש ומעדכנת את המערכת שהיא פועלת
+    // מפעיל את מוזיקת הרקע מחדש
     public static void playMusic() {
         if (backgroundMusic != null) {
             backgroundMusic.playLoop();
-            isMusicPlaying = true; // מעדכנים חזרה כדי שהכפתור ידע שהמוזיקה פועלת
+            isMusicPlaying = true;
         }
     }
 
+    //מסנכרן את תמונת כפתור הסאונד לפי מצב המוזיקה
     public static void syncButtonIcon(JButton button) {
         if (isMusicPlaying && soundOnIcon != null) {
             button.setIcon(soundOnIcon);
@@ -54,13 +53,13 @@ public class Utils {
         }
     }
 
-    // פונקציית הקסם: יוצרת ומחזירה כפתור מוזיקה פעיל לחלוטין!
+    //יוצר כפתור שמדליק ומכבה מוזיקת רקע
     public static JButton createSoundButton() {
-        if (soundOnIcon == null || soundOffIcon == null) //צריך לבדוק
-        {
+        if (soundOnIcon == null || soundOffIcon == null) {
             soundOnIcon = resizeIcon("/sound_on.png", 50, 50);
             soundOffIcon = resizeIcon("/sound_off.png", 50, 50);
         }
+
         JButton soundButton = new JButton();
         soundButton.setBounds(20, 20, 50, 50);
         soundButton.setFocusPainted(false);
@@ -68,45 +67,34 @@ public class Utils {
         soundButton.setBorderPainted(false);
         soundButton.setFocusable(false);
 
-        // הגדרת תמונה התחלתית לפי המצב הנוכחי של המוזיקה
-        if (isMusicPlaying && soundOnIcon != null) {
-            soundButton.setIcon(soundOnIcon);
-        } else if (!isMusicPlaying && soundOffIcon != null) {
-            soundButton.setIcon(soundOffIcon);
-        } else {
-            soundButton.setText(isMusicPlaying ? "Sound" : "Mute");
-            soundButton.setContentAreaFilled(true);
-            soundButton.setBackground(Color.WHITE);
-        }
+        syncButtonIcon(soundButton);
 
-        // פעולת הלחיצה
         soundButton.addActionListener(e -> {
             if (isMusicPlaying) {
-                backgroundMusic.stop();
-                if (soundOffIcon != null) soundButton.setIcon(soundOffIcon);
-                else soundButton.setText("Mute");
-                isMusicPlaying = false;
+                stopMusic();
             } else {
-                backgroundMusic.playLoop();
-                if (soundOnIcon != null) soundButton.setIcon(soundOnIcon);
-                else soundButton.setText("Sound");
-                isMusicPlaying = true;
+                playMusic();
             }
+
+            syncButtonIcon(soundButton);
         });
+
         return soundButton;
     }
 
-    // העברנו את זה לכאן כי זו פונקציית עזר כללית
+    // משנה גודל של אייקון
     private static ImageIcon resizeIcon(String path, int width, int height) {
         URL imgUrl = Utils.class.getResource(path);
+
         if (imgUrl != null) {
             ImageIcon originalIcon = new ImageIcon(imgUrl);
             Image img = originalIcon.getImage();
             Image resizedImage = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
             return new ImageIcon(resizedImage);
-        } else {
-            System.out.println("לא מצאתי את קובץ האייקון: " + path);
-            return null;
         }
+
+        System.out.println("לא מצאתי את קובץ האייקון: " + path);
+        return null;
     }
 }

@@ -10,19 +10,23 @@ public class Prize {
     private int width;
     private int height;
     private Image image;
-
-    // משתנה שזוכר האם הקאפקייק כבר אסף את הסוכריה הזו
     private boolean isCollected;
+    private int points;
 
     public Prize(int x, int y, int width, int height, String imagePath) {
+        this(x, y, width, height, imagePath, 10);
+    }
+
+    public Prize(int x, int y, int width, int height, String imagePath, int points) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.isCollected = false; // בהתחלה שום סוכריה עדיין לא נאספה
+        this.points = points;
+        this.isCollected = false;
 
-        // טעינת התמונה של הסוכריה מתוך תיקיית resources
         URL resource = getClass().getResource(imagePath);
+
         if (resource != null) {
             this.image = new ImageIcon(resource).getImage();
         } else {
@@ -30,25 +34,42 @@ public class Prize {
         }
     }
 
-    // פונקציה שאחראית לצייר את הסוכריה על המסך
     public void draw(Graphics g) {
-        // אנחנו נצייר את הסוכריה רק אם היא עדיין לא נאספה!
         if (!isCollected && image != null) {
             g.drawImage(image, x, y, width, height, null);
-
         }
     }
 
     public Rectangle getBounds() {
-        // אנחנו "מגלחים" פיקסלים מהשוליים של התמונה כדי שהמלבן יהיה צמוד יותר לסוכריה עצמה
-        int trimX = 3;  // מורידים פיקסלים משמאל וימין (כי הסוכריה צרה)
-        int trimY = 5; // מורידים פיקסלים מלמעלה ולמטה (כדי להתעלם מקצוות העטיפה)
+        if (points == 20) {
+            int hitWidth = width / 3;
+            int hitHeight = (int) (height * 0.70);
 
-        // יוצרים מלבן חדש: הוא מתחיל קצת יותר פנימה, והרוחב/גובה שלו קטנים יותר
-        return new Rectangle(x + trimX, y + trimY, width - (2 * trimX), height - (2 * trimY));
+            int hitX = x + (width - hitWidth) / 2;
+            int hitY = y + 4;
+
+            return new Rectangle(
+                    hitX,
+                    hitY,
+                    hitWidth,
+                    hitHeight
+            );
+        }
+
+        int trimX = 3;
+        int trimY = 5;
+
+        return new Rectangle(
+                x + trimX,
+                y + trimY,
+                width - (2 * trimX),
+                height - (2 * trimY)
+        );
     }
 
-    // --- Getters & Setters ---
+    public int getPoints() {
+        return this.points;
+    }
 
     public boolean isCollected() {
         return isCollected;

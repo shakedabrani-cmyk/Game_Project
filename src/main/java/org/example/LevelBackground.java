@@ -1,17 +1,15 @@
 package org.example;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.io.InputStream;
-import java.net.URL;
 
-public class LevelsBackground {
+public class LevelBackground {
     private Image backgroundImage;
 
-    public LevelsBackground(){
+    public LevelBackground(){
         try{
-            InputStream inputStream = LevelsBackground.class.getResourceAsStream("/background_level.jpeg");
+            InputStream inputStream = LevelBackground.class.getResourceAsStream("/background_level.jpeg");
             this.backgroundImage = ImageIO.read(inputStream);
         }catch (Exception e){
             e.printStackTrace();
